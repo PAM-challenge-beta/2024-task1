@@ -1,0 +1,7 @@
+*.h5
+misc
+__pycache__
+dclde
+gsl
+trained_models
+.envrc
