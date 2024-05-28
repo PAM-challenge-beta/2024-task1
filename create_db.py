@@ -13,7 +13,7 @@ from skimage.transform import resize
 
 
 def create_db(data_dir, audio_representation, annotations=None, output="db.h5", 
-              table_name='/train', num_background='same', overwrite=False, exclude_subdirs=None):
+              table_name='/train', num_background='same', overwrite=False, seed_negative_samples=0, exclude_subdirs=None):
 
     # Load annotations
     annotations = pd.read_csv(annotations)
@@ -37,7 +37,7 @@ def create_db(data_dir, audio_representation, annotations=None, output="db.h5",
 
     print("Extracting random background segments...")
     files = file_duration_table(data_dir, exclude_subdirs=exclude_subdirs)
-    background = create_random_segments(files, duration=config['duration'], num=num_background, annotations=annotations)
+    background = create_random_segments(files, duration=config['duration'], num=num_background, annotations=annotations, seed=seed_negative_samples)
     background['label'] = 0
 
     # Concatenate annotations and background DataFrames to store in our hdf5 database
@@ -78,6 +78,7 @@ def main():
     parser.add_argument('--table_name', default='/train', type=str, help="Table name within the database where the data will be stored. Must start with a foward slash. For instance '/train'")
     parser.add_argument('--num_background', default='same', type=num_background_type, help="Number of backgorund samples to ectract by randomly sampling from all audio files while avoinding the annotations. Can be either an integer or 'same', in which case will match the number of annotations")
     parser.add_argument('--output', default='db.h5', type=str, help='HDF5 dabase name. For instance: db.h5')
+    parser.add_argument('--seed_negative_samples', default=0, type=int, help='Seed to fix pseudo randomness when generating the background (negative) samples')
     parser.add_argument('--exclude_subdirs', default=None,  nargs='+', type=str, help='Subdirs to exclude from the annotations. Usefull for splitting into different sets')
     parser.add_argument('--overwrite', default=False, type=boolean_string, help='Overwrite the database. Otherwise append to it.')
     args = parser.parse_args()

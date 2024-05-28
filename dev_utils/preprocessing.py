@@ -132,7 +132,7 @@ def validate_segment(annotations, fname, start, end, buffer):
     return True  # No overlap, segment is valid
 
 
-def create_random_segments(files, duration, num, annotations=None, buffer=0):
+def create_random_segments(files, duration, num, annotations=None, buffer=0, seed = 0):
     """
     Generates a specified number of random audio segments from a list of files, ensuring no overlap with annotations.
 
@@ -149,6 +149,8 @@ def create_random_segments(files, duration, num, annotations=None, buffer=0):
     Raises:
         Warning: If the number of generated samples is less than the requested number due to overlap or file duration limits.
     """
+    np.random.seed(seed)
+    
     results = []
     attempts = 0
     max_attempts = num * 10  # Limit on attempts to prevent infinite loops
@@ -160,7 +162,7 @@ def create_random_segments(files, duration, num, annotations=None, buffer=0):
 
     while len(results) < num and attempts < max_attempts:
         # Sample a file based on duration probability
-        chosen_file = files.sample(1, weights='prob').iloc[0]
+        chosen_file = files.sample(1, weights='prob', random_state=seed).iloc[0]
         # Calculate the maximum possible valid start time considering the duration and buffer
         max_start = chosen_file['duration'] - duration - buffer
         # Randomly determine the start time within the valid range
