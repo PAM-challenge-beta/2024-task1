@@ -7,7 +7,7 @@ import soundfile as sf
 from dev_utils.constants import IMG_HEIGHT, IMG_WIDTH
 from tqdm import tqdm
 from pathlib import Path
-from dev_utils.preprocessing import define_intervals, create_random_segments, file_duration_table, load_data, normalize_to_range
+from dev_utils.preprocessing import define_intervals, create_random_segments, file_duration_table, load_data, preprocess_audio_segment
 from dev_utils.hdf5_helper import SpectrogramTable, insert_spectrogram_data, create_or_get_table
 from skimage.transform import resize
 
@@ -49,18 +49,9 @@ def create_db(data_dir, audio_representation, annotations=None, output="db.h5",
         for idx, row in tqdm(combined_df.iterrows(), total=combined_df.shape[0]):
             y, sr = load_data(path=Path(data_dir) / row['filename'], start=row['start'], end=row['start'] + config['duration'], new_sr=config['sr'])
 
-            # Converting windows size and step size to nfft and hop length (in frames) because librosa uses that.
-            n_fft = int(config["window"] * sr)  # Window size
-            hop_length = int(config['step'] * sr)  # Step size
-            # Compute the spectrogram
-            S = np.abs(librosa.stft(y, n_fft=n_fft, hop_length=hop_length))
-            # Convert to decibels
-            spec = librosa.amplitude_to_db(S, ref=np.max)
+            audio_representation = preprocess_audio_segment(y, sr, window_size=config['window'], step_size=config['step'])
 
-            representation_data = resize(spec, (IMG_HEIGHT,IMG_WIDTH))
-            representation_data = normalize_to_range(representation_data)
-
-            insert_spectrogram_data(table, row['filename'], row['label'], representation_data)
+            insert_spectrogram_data(table, row['filename'], row['label'], audio_representation)
     
 
 def main():
