@@ -2,12 +2,10 @@ import numpy as np
 import pandas as pd
 import json
 import tables as tb
-from dev_utils.constants import IMG_HEIGHT, IMG_WIDTH
 from tqdm import tqdm
 from pathlib import Path
 from dev_utils.preprocessing import define_intervals, create_random_segments, file_duration_table, load_data, preprocess_audio_segment
 from dev_utils.hdf5_helper import SpectrogramTable, insert_spectrogram_data, create_or_get_table
-from skimage.transform import resize
 import warnings
 
 def create_db(data_dir, audio_representation, annotations=None, output="db.h5", 
