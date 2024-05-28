@@ -69,7 +69,7 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
                 audio_representation = audio_representation.reshape(1, IMG_HEIGHT, IMG_WIDTH, 1)
                 predictions = model(audio_representation, training=False)
             else: # pytorch
-                predictions = model.predict(audio_representation, verbose=0)
+                predictions = model.make_prediction(audio_representation)
             
             # Check for positive class with threshold
             if predictions[0][1] > threshold:  # Index [0][1] for class 1 probability

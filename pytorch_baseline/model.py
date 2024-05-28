@@ -67,7 +67,7 @@ class CNNModel(nn.Module):
         """
         torch.save(self.state_dict(), f"{model_path}/model.pth")
 
-    def predict(self, x):
+    def make_prediction(self, x):
         """
         Predicts the class of the input data.
 
