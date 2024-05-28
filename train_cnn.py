@@ -1,9 +1,6 @@
 from pathlib import Path
 from dev_utils.constants import IMG_HEIGHT, IMG_WIDTH
 
-from pytorch_baseline import training_routine as torch_training_routine
-from tensorflow_baseline import training_routine as tf_training_routine
-
 def train_cnn(hdf5_db, train_table="/train", val_table=None, epochs=10, batch_size=32, output_folder=None, seed=None, deep_learning_library="tensorflow", device="cpu"):
     """
     Trains a CNN model on the provided dataset.
@@ -19,19 +16,22 @@ def train_cnn(hdf5_db, train_table="/train", val_table=None, epochs=10, batch_si
         output_folder (str): Directory to save the trained model.
         seed (int): Seed for random number generator.
         deep_learning_library (str): The deep learning library to use (either pytorch or tensorflow).
-        
+        device (str): Device to run the training on (e.g., "cpu" or "cuda"), only relevant for pytorch.
+
     Returns:
-        tf.keras.callbacks.History: Training history object.
+        Trained model and training history object.
     """
     
     if deep_learning_library == "tensorflow":
+        from tensorflow_baseline import training_routine as tf_training_routine
         trained_model, history = tf_training_routine.train_model(hdf5_db, input_shape=(IMG_HEIGHT, IMG_WIDTH, 1), num_classes=2,
-                                                                 train_table=train_table, val_table=val_table, epochs=epochs, batch_size=batch_size, seed=seed, device=device)
-    
+                                                                 train_table=train_table, val_table=val_table, epochs=epochs, batch_size=batch_size, seed=seed)
+        tf_training_routine.plot_training_history(history)
     elif deep_learning_library == "pytorch":
+        from pytorch_baseline import training_routine as torch_training_routine
         trained_model, history = torch_training_routine.train_model(hdf5_db, input_shape=(IMG_HEIGHT, IMG_WIDTH, 1), num_classes=2, 
                                                                     train_table=train_table, val_table=val_table, epochs=epochs, batch_size=batch_size, seed=seed, device=device)
-
+        torch_training_routine.plot_losses(history)
     else:
         raise ValueError(f"Invalid deep learning library: {deep_learning_library}, only PyTorch and TensorFlow are supported.")
     
@@ -63,18 +63,13 @@ def main():
     parser.add_argument('--output_folder', default=None, type=str, help='Output directory')
     parser.add_argument('--seed', default=None, type=int, help='Seed for random number generator')
     parser.add_argument('--deep_learning_library', default="tensorflow", type=str, help='The deep learning library to use (either pytorch or tensorflow)')
-    parser.add_argument('--device', default="cpu", type=str, help='Device to run the code')
+    parser.add_argument('--device', default="cpu", type=str, help='Device to run the code, cpu or cuda. Only relevant for pytorch')
 
 
     # parser.add_argument('--checkpoints', default=None, type=int, help='Checkpoint frequency in terms of epochs.')
     args = parser.parse_args()
 
     model, history = train_cnn(**vars(args))
-    if args.deep_learning_library == "tensorflow":
-        tf_training_routine.plot_training_history(history)
-
-    elif args.deep_learning_library == "pytorch":
-        torch_training_routine.plot_losses(history)
 
 if __name__ == "__main__":
     main()

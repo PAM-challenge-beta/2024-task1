@@ -1,8 +1,5 @@
 import tensorflow as tf
-
 from matplotlib import pyplot as plt
-from pathlib import Path
-
 from model import create_model
 from batch_generator import BatchGenerator  
 
@@ -75,27 +72,3 @@ def plot_training_history(history):
     plt.legend(['Train', 'Validation'], loc='upper left')
 
     plt.show()
-
-# def main():
-#     import argparse
-
-#     # parse command-line args
-#     parser = argparse.ArgumentParser()
-    
-#     parser.add_argument('hdf5_db', type=str, help='HDF5 Database file path')
-#     parser.add_argument('--train_table', default='/train', type=str, help="The table within the hdf5 database where the training data is stored. For example, /train")
-#     parser.add_argument('--val_table', default=None, type=str, help="The table within the hdf5 database where the training data is stored. For example, /val")
-#     parser.add_argument('--epochs', default=20, type=int, help='The number of epochs')
-#     parser.add_argument('--batch_size', default=32, type=int, help='Batch size')
-#     parser.add_argument('--output_folder', default=None, type=str, help='Output directory')
-#     parser.add_argument('--seed', default=None, type=int, help='Seed for random number generator')
-#     parser.add_argument('--depp_learning_library', default="tensorflow", type=str, help='The deep learning library to use (either pytorch or tensorflow)')
-
-#     # parser.add_argument('--checkpoints', default=None, type=int, help='Checkpoint frequency in terms of epochs.')
-#     args = parser.parse_args()
-
-#     history = train_model(**vars(args))
-#     plot_training_history(history)
-
-# if __name__ == "__main__":
-#     main()
