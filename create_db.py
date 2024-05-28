@@ -8,13 +8,15 @@ from pathlib import Path
 from dev_utils.preprocessing import define_intervals, create_random_segments, file_duration_table, load_data, preprocess_audio_segment
 from dev_utils.hdf5_helper import SpectrogramTable, insert_spectrogram_data, create_or_get_table
 from skimage.transform import resize
-
+import warnings
 
 def create_db(data_dir, audio_representation, annotations=None, output="db.h5", 
-              table_name='/train', num_background='same', overwrite=False, seed_negative_samples=0, exclude_subdirs=None, seed=None):
+              table_name='/train', num_background='same', overwrite=False, seed_negative_samples=0, exclude_subdirs=None, seed=0):
 
-    if seed:
+    if seed is not None:
         np.random.seed(seed)
+    else:
+        warnings.warn("Warning: seed is None, hence randomness is not fixed. It will impact reproducibility, especially because negative samples are generated at random.")
 
     # Load annotations
     annotations = pd.read_csv(annotations)
@@ -82,7 +84,7 @@ def main():
     parser.add_argument('--seed_negative_samples', default=0, type=int, help='Seed to fix pseudo randomness when generating the background (negative) samples')
     parser.add_argument('--exclude_subdirs', default=None,  nargs='+', type=str, help='Subdirs to exclude from the annotations. Usefull for splitting into different sets')
     parser.add_argument('--overwrite', default=False, type=boolean_string, help='Overwrite the database. Otherwise append to it.')
-    parser.add_argument('--seed', default=None, type=int, help='Seed for random number generator')
+    parser.add_argument('--seed', default=0, type=int, help='Seed for random number generator')
     args = parser.parse_args()
 
     create_db(**vars(args))
