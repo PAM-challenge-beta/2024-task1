@@ -1,7 +1,6 @@
 import pandas as pd
 import librosa
 import math
-import tensorflow as tf
 import numpy as np
 import json
 from dev_utils.constants import IMG_HEIGHT, IMG_WIDTH
@@ -9,7 +8,10 @@ from pathlib import Path
 from dev_utils.preprocessing import preprocess_audio_segment, load_data
 from tqdm import tqdm
 
-def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.csv", threshold=0.5):
+import tensorflow_baseline.model as tf_model
+import pytorch_baseline.model as torch_model
+
+def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.csv", threshold=0.5, deep_learning_library="tensorflow", device="cpu"):
     """
     Processes audio files to detect events using a CNN model.
 
@@ -29,8 +31,12 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
     audio_files = [audio_file for audio_file in data_dir.rglob('*.wav')]
 
     # Load model
-    model = tf.keras.models.load_model(model_path)
-    
+    if deep_learning_library == "tensorflow":
+        model = tf_model.load_model(model_path, device=device)
+        
+    elif deep_learning_library == "pytorch":
+        model = torch_model.load_model(model_path, device=device)
+        model.eval()
 
     output_csv_path = Path(output_csv).resolve()
     output_csv_path.parent.mkdir(parents=True, exist_ok=True)
@@ -54,10 +60,11 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
                 y = np.pad(y, (0, padding_length), mode='reflect')
 
             audio_representation = preprocess_audio_segment(y, sr, window_size=config['window'], step_size=config['step'])
-            audio_representation = audio_representation.reshape(1, IMG_HEIGHT, IMG_WIDTH, 1)
+            #audio_representation = audio_representation.reshape(1, IMG_HEIGHT, IMG_WIDTH, 1) # I removed this line, @Bruno check the tensorflow version
 
-            # Predict the segment
-            predictions = model(audio_representation, training=False)
+            # Predict the segment$
+            predictions = model.predict(audio_representation)
+
             
             # Check for positive class with threshold
             if predictions[0][1] > threshold:  # Index [0][1] for class 1 probability
@@ -80,6 +87,8 @@ def main():
     parser.add_argument('audio_representation', type=str, help='Path to the audio representation config file .json')
     parser.add_argument('--output_csv', default='detections.csv', type=str, help='Path to save the detections CSV file.')
     parser.add_argument('--threshold', default=0.5, type=float, help="Detection threshold. Default is 0.5.")
+    parser.add_argument('--deep_learning_library', default="tensorflow", type=str, help='The deep learning library to use (either pytorch or tensorflow)')
+    parser.add_argument('--device', default="cpu", type=str, help='Device to run the code')
     args = parser.parse_args()
 
     run_cnn(**vars(args))
