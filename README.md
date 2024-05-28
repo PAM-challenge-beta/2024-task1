@@ -1,4 +1,4 @@
-# Task 2-a - Detecting North Atlantic right whales in different envirionments
+# Task 1 - Detecting North Atlantic right whales in different envirionments
 
 ## Introduction
 
