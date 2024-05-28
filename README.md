@@ -113,12 +113,18 @@ We have prepared a sample code to serve as an example and to provide general gui
 
 Python > 3.9.10
 
-It is recommended to create a new python environment to run the code and install the dependencies.
+It is recommended to create a new python environment to run the code and install the dependencies. A tensorflow and pytorch requirements file is made available and participants may choose their prefered library. You may find them in the requirements folder.
 
 Install the dependencies with:
 
 ```
-pip install -r requirements.txt
+pip install -r tf_requirements.txt
+```
+
+or 
+
+```
+pip install -r torch_requirements.txt
 ```
 
 To run the code simply issue the commands in your CLI. Ensure you are in the correct working directory. Remember that if you are using a Windows operating system, you will need to replace the forward slashes (`/`) in the directory paths with backslashes (`\`).
@@ -137,7 +143,7 @@ In this example, a simple 2-layer CNN will be trained to classify 3-second audio
 Each stage of the process is encapsulated in its own Python script:
 - `create_db.py` — For data preprocessing and database creation.
 - `train_cnn.py` — For CNN training.
-- `run_cnn.py` — For the application of the CNN classifier on test data.
+- `test_cnn.py` — For the application of the CNN classifier on test data.
 - `metrics.py` — For the calculation of performance metrics.
 
 The configuration for the spectrogram is specified in the `spec_config.json` file. Each script contains detailed comments and can be executed via the OS CLI, as outlined in the sections below. Participants are allowed to reuse and modify any part of the code for their needs.
@@ -193,12 +199,12 @@ Make sure to adjust the paths to the locations where you downloaded the DCLDE da
 
 ## Train a Model
 
-Now, a simple 2-layer CNN will be trained to classify 3-second audio segments as either containing a NARW upcall or not. Details on the implementation can be found in the train_cnn.py script.
+Now, a simple 2-layer CNN will be trained to classify 3-second audio segments as either containing a NARW upcall or not. Details on the implementation can be found in the train_cnn.py script. Please, remember to change the `--deep_learning_library` parameter if you are using pytorch.
 
 To train the model, run the following command:
 
 ```shell
-python train_cnn.py task1.h5 --train_table /train --val_table /val --epochs 10 --batch_size 64 --output_folder trained_models/
+python train_cnn.py task1.h5 --train_table /train --val_table /val --epochs 10 --batch_size 64 --deep_learning_library tensorflow --output_folder trained_models/
 ```
 
 ### Parameters Explained
@@ -208,6 +214,7 @@ python train_cnn.py task1.h5 --train_table /train --val_table /val --epochs 10 -
 - `--val_table /val`: Specifies the HDF5 table to use for validation.
 - `--epochs 10`: The number of training epochs.
 - `--batch_size 64`: The batch size for training.
+- `--deep_learning_library tensorflow` If you are using pytorch, replace tensorflow with pytorch.
 - `--output_folder trained_models/`: The directory where the trained model will be saved.
 
 ## Run the Model

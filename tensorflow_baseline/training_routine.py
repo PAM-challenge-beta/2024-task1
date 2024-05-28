@@ -1,7 +1,7 @@
 import tensorflow as tf
 from matplotlib import pyplot as plt
-from model import create_model
-from batch_generator import BatchGenerator  
+from tensorflow_baseline.model import create_model
+from tensorflow_baseline.batch_generator import BatchGenerator  
 
 def train_model(hdf5_db, input_shape=(128,128,1), num_classes=2, train_table="/train", val_table=None, epochs=10, batch_size=32, seed=None):
     """
