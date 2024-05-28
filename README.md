@@ -153,7 +153,7 @@ We will split the train/val set temporally, reserving the first four days for tr
 Run the following command to create the training database:
 
 ```shell
-python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv --table_name /train --exclude_subdirs NOPP6_EST_20090403 NOPP6_EST_20090401 NOPP6_EST_20090402 --output task1.h5
+python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv --table_name /train --exclude_subdirs NOPP6_EST_20090403 NOPP6_EST_20090401 NOPP6_EST_20090402 --output task1.h5 --seed 0
 ```
 
 ### Parameters Explained
@@ -167,6 +167,7 @@ python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv
     - `NOPP6_EST_20090401`
     - `NOPP6_EST_20090402`
 - `--output task1.h5`: The name of the output HDF5 file.
+- `--seed`: The random number generator seed. By default, none is used. Here we are specifying a seed to ensure consistency.
 
 ### Creating the Validation Dataset
 

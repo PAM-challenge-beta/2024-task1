@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
-import librosa
 import json
 import tables as tb
-import soundfile as sf
 from dev_utils.constants import IMG_HEIGHT, IMG_WIDTH
 from tqdm import tqdm
 from pathlib import Path
@@ -13,7 +11,10 @@ from skimage.transform import resize
 
 
 def create_db(data_dir, audio_representation, annotations=None, output="db.h5", 
-              table_name='/train', num_background='same', overwrite=False, seed_negative_samples=0, exclude_subdirs=None):
+              table_name='/train', num_background='same', overwrite=False, seed_negative_samples=0, exclude_subdirs=None, seed=None):
+
+    if seed:
+        np.random.seed(seed)
 
     # Load annotations
     annotations = pd.read_csv(annotations)
@@ -81,6 +82,7 @@ def main():
     parser.add_argument('--seed_negative_samples', default=0, type=int, help='Seed to fix pseudo randomness when generating the background (negative) samples')
     parser.add_argument('--exclude_subdirs', default=None,  nargs='+', type=str, help='Subdirs to exclude from the annotations. Usefull for splitting into different sets')
     parser.add_argument('--overwrite', default=False, type=boolean_string, help='Overwrite the database. Otherwise append to it.')
+    parser.add_argument('--seed', default=None, type=int, help='Seed for random number generator')
     args = parser.parse_args()
 
     create_db(**vars(args))
