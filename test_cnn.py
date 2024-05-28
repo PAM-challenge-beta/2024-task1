@@ -8,9 +8,6 @@ from pathlib import Path
 from dev_utils.preprocessing import preprocess_audio_segment, load_data
 from tqdm import tqdm
 
-import tensorflow_baseline.model as tf_model
-import pytorch_baseline.model as torch_model
-
 def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.csv", threshold=0.5, deep_learning_library="tensorflow", device="cpu"):
     """
     Processes audio files to detect events using a CNN model.
@@ -21,6 +18,8 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
         audio_representation (str): Path to the JSON file containing configuration for spectrogram.
         output_csv (str): Path to save the detections CSV file.
         threshold (float): Probability threshold for considering a detection.
+        deep_learning_library (str): The deep learning library to use (either pytorch or tensorflow).
+        device (str): Device to run the training on (e.g., "cpu" or "cuda"), only relevant for pytorch.
     """
     data_dir = Path(data_dir)
 
@@ -32,11 +31,15 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
 
     # Load model
     if deep_learning_library == "tensorflow":
-        model = tf_model.load_model(model_path, device=device)
+        import tensorflow_baseline.model as tf_model
+        model = tf_model.load_model(model_path)
         
     elif deep_learning_library == "pytorch":
+        import pytorch_baseline.model as torch_model
         model = torch_model.load_model(model_path, device=device)
         model.eval()
+    else:
+        raise ValueError(f"Invalid deep learning library: {deep_learning_library}, only PyTorch and TensorFlow are supported.")
 
     output_csv_path = Path(output_csv).resolve()
     output_csv_path.parent.mkdir(parents=True, exist_ok=True)
@@ -49,22 +52,24 @@ def run_cnn(data_dir, model_path, audio_representation, output_csv="detections.c
 
         detections = [] # List of detections for the current file
         for i in range(num_segments):
+            # Getting the number of x-second segments in the file where x is defined in the config file duration
             start = i * config['duration']
             end = min((i + 1) * config['duration'], file_total_duration)
             y, sr = load_data(path=file, start=start, end=end, new_sr=config['sr'])
 
-            # Check if the last segment needs to be padded or dropped
+            # Check if the last segment needs to be padded
             if len(y) < config['duration'] * config['sr']:
                 padding_length = int(config['duration'] * config['sr']) - len(y)
                 # Padding the last segment with its reflection
                 y = np.pad(y, (0, padding_length), mode='reflect')
 
             audio_representation = preprocess_audio_segment(y, sr, window_size=config['window'], step_size=config['step'])
-            #audio_representation = audio_representation.reshape(1, IMG_HEIGHT, IMG_WIDTH, 1) # I removed this line, @Bruno check the tensorflow version
-
-            # Predict the segment$
-            predictions = model.predict(audio_representation)
-
+            # Predict the segments
+            if deep_learning_library == "tensorflow":
+                audio_representation = audio_representation.reshape(1, IMG_HEIGHT, IMG_WIDTH, 1)
+                predictions = model(audio_representation, training=False)
+            else: # pytorch
+                predictions = model.predict(audio_representation, verbose=0)
             
             # Check for positive class with threshold
             if predictions[0][1] > threshold:  # Index [0][1] for class 1 probability

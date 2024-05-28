@@ -228,10 +228,10 @@ Since our model operates on 3-second segments, to comply with the challenge spec
 
 Other approaches can be taken, and participants are encouraged to use any method they see fit for their model.
 
-For the purposes of htis sample code, to run the model on a dicretory of audio files:
+For the purposes of this sample code, to run the model on a dicretory of audio files (remember to change the `--deep_learning_library` argument if you are using pytorch):
 
 ```shell
-python run_cnn.py gsl/ trained_models/ spec_config.json --output_csv="detections.csv" --threshold=0.5
+python test_cnn.py gsl/ trained_models/ spec_config.json --deep_learning_library tensorflow --output_csv="detections.csv" --threshold=0.5
 ```
 
 ### Parameters Explained
@@ -239,6 +239,7 @@ python run_cnn.py gsl/ trained_models/ spec_config.json --output_csv="detections
 - `gsl/`: The directory containing the test audio files from the Gulf of St. Lawrence.
 - `trained_models/`: The directory containing the trained model from the previous step.
 - `spec_config.json`: The spectrogram configuration file used to create the database.
+- `--deep_learning_library tensorflow` If you are using pytorch, replace tensorflow with pytorch.
 - `--output_csv detections.csv`: The name of the output CSV file where detections will be saved.
 - `--threshold 0.5`: The detection threshold.
 
