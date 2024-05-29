@@ -19,7 +19,8 @@ The test data was collected in the Gulf of St. Lawrence and is a subset of the d
 
 Both the training and test data have been reorganized and are available in a single downloadable package.
 
-
+- Training annotation file: `annotations_DCLDE2013.csv`
+- Testing annotation file: `annotations_GSL.csv`
 
 ### Data Annotation
 The annotations for the training set have been standardized as follows:
@@ -38,14 +39,15 @@ For instance:
 
 Consider an audio file named `NARW_20230601_0845.wav` containing a detected North Atlantic right whale upcall. The annotation for this file in the dataset might look like this:
 
-| filename                  | start | end  |
-|---------------------------|-------|------|
-| NARW_20230601_0845.wav    | 123.5   | 125.2  |
+| filename                  | start | end  | label |
+|---------------------------|-------|------|-------|
+| NARW_20230601_0845.wav    | 123.5 | 125.2 | up | 
 
 Where:
 - `filename`: `NARW_20230601_0845.wav` is the name of the audio file.
 - `start`: `123.5` seconds is the time from the start of the audio file when the NARW upcall begins.
 - `end`: `125.2` seconds is the time when the upcall ends.
+- `label`: `up` the label for this annotation. Note that for this particular challenge, all entries have the same label. The label column is included just for consistency.
 
 
 The annotations for the test set include:
@@ -56,6 +58,7 @@ The annotations for the test set include:
 Where:
 - `filename`: The name of the file where the detection occurred.
 - `timestamp`: The detection time from the start of the file.
+- `label`: `up` the label for this annotation. Note that for this particular challenge, all entries have the same label. The label column is included just for consistency.
 
 You may find both train an test set annotatiosn in the annotations folder.
 
@@ -83,7 +86,7 @@ Models will be evaluated based on precision, recall, F1 score, and false positiv
 Please compute the performance metrics using the provided `metrics.py` script as follows:
 
 ```shell
-python metrics.py annotations/annotations_test.csv detections.csv
+python metrics.py annotations/annotations_GSL.csv detections.csv
 ```
 
 If you are using a Windows operating system, you will need to replace the forward slashes (`/`) in the directory paths with backslashes (`\`).
@@ -159,14 +162,14 @@ We will split the train/val set temporally, reserving the first four days for tr
 Run the following command to create the training database:
 
 ```shell
-python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv --table_name /train --exclude_subdirs NOPP6_EST_20090403 NOPP6_EST_20090401 NOPP6_EST_20090402 --output task1.h5 --seed 0
+python create_db.py dclde/ spec_config.json annotations/annotations_DCLDE2013.csv --table_name /train --exclude_subdirs NOPP6_EST_20090403 NOPP6_EST_20090401 NOPP6_EST_20090402 --output task1.h5 --seed 0
 ```
 
 ### Parameters Explained
 
 - `dclde/`: The path to the directory where the DCLDE data is stored.
 - `spec_config.json`: The path to the spectrogram configuration file.
-- `annotations/annotations_trainval.csv`: The path to the training annotations file.
+- `annotations/annotations_DCLDE2013.csv`: The path to the training annotations file.
 - `--table_name /train`: Specifies that the table name in the HDF5 file.
 - `--exclude_subdirs`: Specifies the folders to exclude from extraction. In this case, we are excluding the last 3 day folders as they will be used for validation.
     - `NOPP6_EST_20090403`
@@ -180,13 +183,13 @@ python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv
 Next, run the following command to create the validation database, excluding the folders used for training:
 
 ```shell
-python create_db.py dclde/ spec_config.json annotations/annotations_trainval.csv --table_name /val --exclude_subdirs NOPP6_EST_20090330 NOPP6_EST_20090329 NOPP6_EST_20090328 NOPP6_EST_20090331 --output task1.h5
+python create_db.py dclde/ spec_config.json annotations/annotations_DCLDE2013.csv --table_name /val --exclude_subdirs NOPP6_EST_20090330 NOPP6_EST_20090329 NOPP6_EST_20090328 NOPP6_EST_20090331 --output task1.h5
 ```
 ### Parameters Explained
 
 - `dclde/`: The path to the directory where the DCLDE data is stored.
 - `spec_config.json`: The path to the spectrogram configuration file.
-- `annotations/annotations_trainval.csv`: The path to the training annotations file.
+- `annotations/annotations_DCLDE2013.csv`: The path to the training annotations file.
 - `--table_name /val`: Specifies that the table name in the HDF5 file.
 - `--exclude_subdirs`: Specifies the folders to exclude from extraction. Now, we want to exclude the first 4 day folders used for training.
     - `NOPP6_EST_20090330`
@@ -248,10 +251,10 @@ python test_cnn.py gsl/ trained_models/ spec_config.json --deep_learning_library
 Finally, please use the the `metrics.py` script to compute the final evaluation metrics of the detector on the test dataset. All participants will be evaluated in the same manner.
 
 ```shell
-python metrics.py annotations/annotations_test.csv detections.csv
+python metrics.py annotations/annotations_GSL.csv detections.csv
 ```
 
 ### Parameters Explained
 
-- `annotations/annotations_test.csv`: The path to the test annotations file.
+- `annotations/annotations_GSL.csv`: The path to the test annotations file.
 - `detections.csv`: The path to the CSV file containing the model's detections obtained in the previous step.
