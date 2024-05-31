@@ -1,32 +1,3 @@
-# Task 1 - Detecting North Atlantic right whales in different envirionments
-
-## Introduction
-
-The goal of this task is to produce a model that is able to detect North Atlantic right whale (NARW) upcalls accross multiple soundscapes with a reasonable performance. The training dataset is a collection of recordings obtained in the Gulf of Maine (DCLDE 2013) and the test dataset are recordings collected in the Gulf of St. Lawrence. This task emphasizes the importance of data preparation and training strategies to create models that can generalize well to different underwater environments.
-
-
-## Task Description
-
-### Objective
-The objective is to train models on the DCLDE 2013 dataset and assess their ability to generalize to unseen data from the Gulf of St. Lawrence by accurately detecting NARW upcalls.
-
-### Data
-
-The training data for this task is derived from the DCLDE 2013 dataset, specifically the selection that contains North Atlantic right whale (NARW) upcalls. The original dataset can be accessed here: [DCLDE 2013 dataset page](https://research-portal.st-andrews.ac.uk/en/datasets/dclde-2013-workshop-dataset).
-
-The test data was collected in the Gulf of St. Lawrence and is a subset of the data used in a recent publication, which can be reviewed [here](https://pubs.aip.org/asa/jasa/article/147/4/2636/1058640/Performance-of-a-deep-neural-network-at-detecting). The original data set from this publication is available [here](https://doi.org/10.20383/101.0241).
-
-
-Both the training and test data have been reorganized and are available in a single downloadable package.
-
-- Training annotation file: `annotations_DCLDE2013.csv`
-- Testing annotation file: `annotations_GSL.csv`
-
-
-
-Annotations labeled as uncertain have been excluded from the dataset. Additional dataset details are available on the [DCLDE 2013 dataset page](https://research-portal.st-andrews.ac.uk/en/datasets/dclde-2013-workshop-dataset).
-
-
 
 ### Model Requirements
 
