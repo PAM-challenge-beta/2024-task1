@@ -1,21 +1,4 @@
 
-### Model Requirements
-
-Participants are free to employ any preprocessing technique and network architecture. The onyl requirement is that the final output of your model MUST be a CSV file formatted as follows:
-
-| filename   | timestamp |
-| ---------- | --------- |
-Where:
-- `filename`: The name of the file where the detection occurred.
-- `timestamp`: The detection time from the start of the file.
-
-A 1.5-second buffer will be applied, where detections within this range from the annotation will be considered a true positive.
-
-Please see the examples in this page for a more in depth discussion on how to provide the timestamps.
-
-### Model Evaluation
-
-Models will be evaluated based on precision, recall, F1 score, and false positive rate (FPR) per hour of recording. The test set includes 25 hours of recordings at 32KHz, with 1157 annotated NARW upcalls.
 
 #### Performance Metrics
 
